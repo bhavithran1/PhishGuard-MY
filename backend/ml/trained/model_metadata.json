@@ -1,0 +1,84 @@
+{
+  "feature_names": [
+    "url_length",
+    "num_dots",
+    "num_hyphens",
+    "num_underscores",
+    "num_slashes",
+    "num_at",
+    "num_ampersand",
+    "num_equals",
+    "num_digits",
+    "num_special",
+    "has_https",
+    "has_ip_address",
+    "hostname_length",
+    "path_length",
+    "query_length",
+    "num_subdomains",
+    "path_depth",
+    "num_params",
+    "hostname_entropy",
+    "path_entropy",
+    "url_entropy",
+    "domain_length",
+    "has_suspicious_tld",
+    "is_shortener",
+    "has_brand_keyword",
+    "digit_ratio",
+    "special_ratio",
+    "has_login_keyword",
+    "has_redirect",
+    "has_data_uri",
+    "has_double_slash_redirect"
+  ],
+  "n_features": 31,
+  "n_training_samples": 16064,
+  "n_test_samples": 4017,
+  "accuracy": 0.9116255912372417,
+  "model_type": "GradientBoostingClassifier",
+  "n_estimators": 300,
+  "max_depth": 8,
+  "top_features": [
+    {
+      "name": "path_length",
+      "importance": 0.5642182978242973
+    },
+    {
+      "name": "path_entropy",
+      "importance": 0.1673605901708343
+    },
+    {
+      "name": "special_ratio",
+      "importance": 0.059948438985090675
+    },
+    {
+      "name": "url_entropy",
+      "importance": 0.041431084571384065
+    },
+    {
+      "name": "num_subdomains",
+      "importance": 0.03878858686720896
+    },
+    {
+      "name": "url_length",
+      "importance": 0.036048443049830736
+    },
+    {
+      "name": "num_digits",
+      "importance": 0.01868944108042457
+    },
+    {
+      "name": "num_slashes",
+      "importance": 0.014422997939734282
+    },
+    {
+      "name": "num_hyphens",
+      "importance": 0.014264344442053383
+    },
+    {
+      "name": "num_dots",
+      "importance": 0.012915479381066837
+    }
+  ]
+}
