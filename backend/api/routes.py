@@ -1,10 +1,9 @@
 import uuid
-import json
 import os
 from datetime import datetime, timedelta
 import random
 
-from fastapi import APIRouter, HTTPException
+from fastapi import APIRouter
 
 from .schemas import (
     URLAnalysisRequest, URLAnalysisResponse,
@@ -20,15 +19,31 @@ analysis_history: list[dict] = []
 reports: list[dict] = []
 
 
+def _session_record_limit() -> int:
+    try:
+        requested_limit = int(os.getenv("MAX_SESSION_RECORDS", "1000"))
+    except ValueError:
+        requested_limit = 1000
+    return max(100, min(requested_limit, 10_000))
+
+
+MAX_SESSION_RECORDS = _session_record_limit()
+
+
+def _append_session_record(records: list[dict], record: dict) -> None:
+    """Keep the prototype's in-memory aggregates bounded and short-lived."""
+    records.append(record)
+    if len(records) > MAX_SESSION_RECORDS:
+        del records[:-MAX_SESSION_RECORDS]
+
+
 @router.post("/analyze/url", response_model=URLAnalysisResponse)
 async def analyze_url(request: URLAnalysisRequest):
-    if not request.url.strip():
-        raise HTTPException(status_code=400, detail="URL cannot be empty")
-    result = model.analyze_url(request.url.strip())
-    analysis_history.append({
+    result = model.analyze_url(request.url)
+    _append_session_record(analysis_history, {
         "type": "url",
-        "content": request.url,
-        "result": result,
+        "is_suspicious": result["is_phishing"],
+        "categories": [],
         "timestamp": datetime.now().isoformat(),
     })
     return result
@@ -36,13 +51,11 @@ async def analyze_url(request: URLAnalysisRequest):
 
 @router.post("/analyze/text", response_model=TextAnalysisResponse)
 async def analyze_text(request: TextAnalysisRequest):
-    if not request.text.strip():
-        raise HTTPException(status_code=400, detail="Text cannot be empty")
-    result = model.analyze_text(request.text.strip())
-    analysis_history.append({
+    result = model.analyze_text(request.text)
+    _append_session_record(analysis_history, {
         "type": "text",
-        "content": request.text[:100],
-        "result": result,
+        "is_suspicious": result["is_suspicious"],
+        "categories": [pattern["pattern"] for pattern in result["matched_patterns"]],
         "timestamp": datetime.now().isoformat(),
     })
     return result
@@ -54,17 +67,17 @@ async def submit_report(request: ReportRequest):
     report = {
         "report_id": report_id,
         "type": request.type,
-        "content": request.content,
-        "reporter_email": request.reporter_email,
-        "description": request.description,
-        "status": "submitted",
+        "content_length": len(request.content),
+        "has_callback_email": request.reporter_email is not None,
+        "has_context": request.description is not None,
+        "status": "local_only",
         "timestamp": datetime.now().isoformat(),
     }
-    reports.append(report)
+    _append_session_record(reports, report)
     return ReportResponse(
         report_id=report_id,
-        status="submitted",
-        message="Report submitted successfully. This will be forwarded to MyCERT/Cyber999 for investigation.",
+        status="local_only",
+        message="Your report metadata was recorded in this local project session. It was not forwarded to any agency. Use the official action pathways for an urgent or formal report.",
     )
 
 
@@ -74,7 +87,7 @@ async def get_stats():
         "total_analyses": len(analysis_history),
         "threats_detected": sum(
             1 for a in analysis_history
-            if a["result"].get("is_phishing") or a["result"].get("is_suspicious")
+            if a["is_suspicious"]
         ),
         "reports_submitted": len(reports),
         "threat_categories": _get_threat_category_stats(),
@@ -136,10 +149,8 @@ async def health():
 def _get_threat_category_stats() -> list[dict]:
     categories = {}
     for a in analysis_history:
-        if a["result"].get("matched_patterns"):
-            for p in a["result"]["matched_patterns"]:
-                cat = p["pattern"]
-                categories[cat] = categories.get(cat, 0) + 1
+        for category in a["categories"]:
+            categories[category] = categories.get(category, 0) + 1
     return [{"category": k, "count": v} for k, v in sorted(categories.items(), key=lambda x: -x[1])]
 
 

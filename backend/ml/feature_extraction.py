@@ -3,6 +3,10 @@ import math
 from urllib.parse import urlparse, parse_qs
 import tldextract
 
+# Use the dependency's bundled suffix snapshot. This keeps analysis offline and
+# prevents a request from attempting a network refresh or user-home cache write.
+TLD_EXTRACTOR = tldextract.TLDExtract(cache_dir=None, suffix_list_urls=())
+
 
 SUSPICIOUS_TLDS = {
     ".tk", ".ml", ".ga", ".cf", ".gq", ".xyz", ".top", ".club", ".work",
@@ -75,7 +79,7 @@ def extract_url_features(url: str) -> dict:
     features["path_entropy"] = entropy(path)
     features["url_entropy"] = entropy(url)
 
-    ext = tldextract.extract(url)
+    ext = TLD_EXTRACTOR(url)
     domain = ext.domain
     suffix = f".{ext.suffix}" if ext.suffix else ""
     features["domain_length"] = len(domain)

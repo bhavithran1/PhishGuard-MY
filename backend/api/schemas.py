@@ -1,19 +1,33 @@
-from pydantic import BaseModel
+from typing import Literal
+
+from pydantic import BaseModel, ConfigDict, Field, field_validator
 
 
 class URLAnalysisRequest(BaseModel):
-    url: str
+    model_config = ConfigDict(extra="forbid", str_strip_whitespace=True)
+    url: str = Field(min_length=1, max_length=2048, description="A URL or domain to assess")
 
 
 class TextAnalysisRequest(BaseModel):
-    text: str
+    model_config = ConfigDict(extra="forbid", str_strip_whitespace=True)
+    text: str = Field(min_length=1, max_length=10_000, description="Message text with sensitive data removed")
 
 
 class ReportRequest(BaseModel):
-    type: str  # "url" | "sms" | "email" | "qr"
-    content: str
-    reporter_email: str | None = None
-    description: str | None = None
+    model_config = ConfigDict(extra="forbid", str_strip_whitespace=True)
+    type: Literal["url", "sms", "email", "qr"]
+    content: str = Field(min_length=1, max_length=10_000)
+    reporter_email: str | None = Field(default=None, max_length=254)
+    description: str | None = Field(default=None, max_length=2_000)
+
+    @field_validator("reporter_email")
+    @classmethod
+    def validate_email_shape(cls, value: str | None) -> str | None:
+        if value is None or value == "":
+            return None
+        if "@" not in value or value.startswith("@") or value.endswith("@"):
+            raise ValueError("Enter a valid callback email address")
+        return value.lower()
 
 
 class URLAnalysisResponse(BaseModel):

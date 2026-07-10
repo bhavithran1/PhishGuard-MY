@@ -55,15 +55,15 @@ export default function Dashboard() {
     <div className="mx-auto max-w-[1500px]">
       <section className="scroll-reveal flex flex-col gap-4 border-b border-[var(--line-dim)] pb-4 lg:flex-row lg:items-end lg:justify-between">
         <div>
-          <p className="panel-kicker">National signal wall</p>
-          <h2 className="glow-title mt-2 text-4xl sm:text-5xl">THREAT STATS</h2>
-          <p className="mono mt-2 text-sm uppercase tracking-[0.1em] text-[var(--muted)]">
-            Malaysia incident snapshot // active console telemetry
+          <p className="panel-kicker">Data literacy exercise</p>
+          <h2 className="glow-title mt-2 text-4xl sm:text-5xl">PRACTICE DATA</h2>
+          <p className="mt-2 text-sm leading-6 text-[var(--muted)]">
+            Illustrative data for discussing risk trends. It is not a live national telemetry feed or an official incident statistic.
           </p>
         </div>
         <div className="mono flex w-fit items-center gap-2 border border-[var(--line)] bg-black/40 px-3 py-2 text-xs font-black uppercase text-[var(--green)]">
-          <span className="status-dot pulse-live" />
-          2025 operating view
+          <span className="status-dot" />
+          sample view
         </div>
       </section>
 
@@ -133,7 +133,7 @@ export default function Dashboard() {
           </div>
         </ChartPanel>
 
-        <ChartPanel title="Monthly incident trend" icon={<TrendingUp className="h-4 w-4" />} badge="LIVE">
+        <ChartPanel title="Monthly incident trend" icon={<TrendingUp className="h-4 w-4" />} badge="SAMPLE">
           <ResponsiveContainer width="100%" height={380}>
             <AreaChart data={ms.monthly_trend} margin={{ left: -8, right: 8, top: 12, bottom: 0 }}>
               <defs>
@@ -191,11 +191,10 @@ export default function Dashboard() {
             <span className="protocol-chip active px-2 py-0.5">SRC</span>
           </div>
           <div className="mono grid gap-3 text-xs leading-5 text-[var(--green-soft)]">
-            <p>MyCERT Quarterly Reports 2025</p>
-            <p>CyberSecurity Malaysia telemetry</p>
-            <p>NACSA NC4 public reporting lanes</p>
+            <p>Use official CyberSecurity Malaysia reports for current incident data.</p>
+            <p>Use PDRM and NSRC channels for scam response.</p>
             <p className="border-t border-[var(--line-dim)] pt-3 text-[var(--muted)]">
-              Local scan counts reflect this running app session.
+              Local scan counts reflect this running app session. Illustrations must not be cited as national statistics.
             </p>
           </div>
         </div>

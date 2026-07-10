@@ -1,35 +1,21 @@
-import { Activity, BarChart3, FileText, Radio, ScanLine, Search, Shield, Swords } from 'lucide-react';
-import { useEffect, useState } from 'react';
-import { api } from '../api';
+import { BookOpen, FileText, HeartHandshake, Radio, ScanLine, Search, Shield, Swords } from 'lucide-react';
 
 export default function Header({
   activeTab,
   onTabChange,
+  onGetHelp,
 }: {
   activeTab: string;
   onTabChange: (tab: string) => void;
+  onGetHelp: () => void;
 }) {
-  const [modelStatus, setModelStatus] = useState<'loading' | 'online' | 'offline'>('loading');
-
-  useEffect(() => {
-    api.health()
-      .then(h => setModelStatus(h.model_loaded ? 'online' : 'offline'))
-      .catch(() => setModelStatus('offline'));
-  }, []);
-
   const tabs = [
-    { id: 'analyzer', label: 'Scan', icon: Search },
-    { id: 'dashboard', label: 'Stats', icon: BarChart3 },
-    { id: 'threats', label: 'Feed', icon: Radio },
+    { id: 'analyzer', label: 'Check', icon: Search },
+    { id: 'learn', label: 'Learn', icon: BookOpen },
+    { id: 'threats', label: 'Alerts', icon: Radio },
     { id: 'report', label: 'Report', icon: FileText },
-    { id: 'cybersquad', label: 'Squad', icon: Swords },
+    { id: 'cybersquad', label: 'Campus', icon: Swords },
   ];
-
-  const statusTone = {
-    online: 'text-[var(--green)]',
-    offline: 'text-[var(--red)]',
-    loading: 'text-[var(--amber)]',
-  }[modelStatus];
 
   return (
     <header className="sticky top-0 z-50 border-b border-[var(--line-dim)] bg-[#050605]/90 backdrop-blur-xl">
@@ -42,22 +28,21 @@ export default function Header({
             <div>
               <div className="glow-title flex items-center gap-2 text-lg leading-none">
                 PHISHGUARD MY
-                <span className="protocol-chip px-1.5 py-0.5 text-[0.58rem]">v1</span>
+                <span className="protocol-chip px-1.5 py-0.5 text-[0.58rem]">STUDENT EDITION</span>
               </div>
               <div className="mono mt-1 flex items-center gap-2 text-[0.68rem] uppercase tracking-[0.14em] text-[var(--muted)]">
                 <ScanLine className="h-3 w-3" />
-                scam knock monitor
+                semak dulu · bantu kawan · lindungi komuniti
               </div>
             </div>
           </div>
 
-          <div className={`mono flex items-center gap-2 border border-[var(--line-dim)] bg-black/35 px-2.5 py-1.5 text-xs font-black uppercase lg:hidden ${statusTone}`}>
-            <span className="status-dot" />
-            {modelStatus === 'online' ? 'ready' : modelStatus}
-          </div>
+          <button onClick={onGetHelp} className="button-primary header-mobile-help min-h-9 px-3 text-[0.68rem]">
+            Get help now
+          </button>
         </div>
 
-        <nav className="grid grid-cols-5 gap-2 lg:flex lg:items-center">
+        <nav className="grid grid-cols-5 gap-1.5 lg:flex lg:items-center">
           {tabs.map(tab => (
             <TabButton
               key={tab.id}
@@ -69,11 +54,10 @@ export default function Header({
           ))}
         </nav>
 
-        <div className={`mono hidden items-center gap-3 border border-[var(--line-dim)] bg-black/35 px-3 py-2 text-xs font-black uppercase tracking-[0.1em] lg:flex ${statusTone}`}>
-          <Activity className="h-4 w-4" />
-          <span className="status-dot" />
-          <span>{modelStatus === 'online' ? 'model ready' : modelStatus === 'offline' ? 'model offline' : 'linking'}</span>
-        </div>
+        <button onClick={onGetHelp} className="button-primary header-desktop-help min-h-10 px-4 text-xs">
+          <HeartHandshake className="h-4 w-4" />
+          I sent money / need help
+        </button>
       </div>
     </header>
   );

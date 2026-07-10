@@ -40,23 +40,23 @@ export default function ThreatFeed() {
     <div className="mx-auto max-w-[1500px]">
       <section className="scroll-reveal flex flex-col gap-4 border-b border-[var(--line-dim)] pb-4 lg:flex-row lg:items-end lg:justify-between">
         <div>
-          <p className="panel-kicker">Hostile lure stream</p>
-          <h2 className="glow-title mt-2 text-4xl sm:text-5xl">LIVE FEED</h2>
-          <p className="mono mt-2 text-sm uppercase tracking-[0.1em] text-[var(--muted)]">
-            Active phishing and scam campaigns targeting Malaysian users
+          <p className="panel-kicker">Practice scenario library</p>
+          <h2 className="glow-title mt-2 text-4xl sm:text-5xl">SCAM PATTERNS</h2>
+          <p className="mt-2 max-w-2xl text-sm leading-6 text-[var(--muted)]">
+            Illustrative Malaysian scam scenarios for learning and discussion. They are not a real-time alert feed or a list of verified active campaigns.
           </p>
         </div>
         <div className="mono flex w-fit items-center gap-2 border border-[var(--line)] bg-black/40 px-3 py-2 text-xs font-black uppercase text-[var(--green)]">
-          <span className="status-dot pulse-live" />
-          {threats.length} campaigns online
+          <span className="status-dot" />
+          {threats.length} learning scenarios
         </div>
       </section>
 
       <section className="mt-5 grid gap-4 xl:grid-cols-[1fr_420px_330px]">
         <div className="terminal-panel scroll-reveal">
           <div className="panel-title px-4 py-3">
-            <span>Live feed: scam attempts</span>
-            <span className="protocol-chip active px-2 py-0.5">ALL</span>
+            <span>Scenario cards</span>
+            <span className="protocol-chip active px-2 py-0.5">EDUCATION</span>
           </div>
           <div className="divide-y divide-[var(--line-dim)]">
             {threats.map(threat => {
@@ -97,16 +97,12 @@ export default function ThreatFeed() {
             <div className="mb-3 flex items-center justify-between">
               <h3 className="panel-kicker flex items-center gap-2">
                 <MapPin className="h-4 w-4" />
-                Target map
+                Before you act
               </h3>
-              <span className="protocol-chip active px-2 py-0.5">HEAT</span>
+              <span className="protocol-chip active px-2 py-0.5">VERIFY</span>
             </div>
-            <div className="threat-globe" />
-            <div className="mono mt-3 flex justify-between text-xs font-black uppercase text-[var(--amber)]">
-              <span>low</span>
-              <span>live lure origin</span>
-              <span>high</span>
-            </div>
+            <p className="text-sm leading-6 text-[var(--green-soft)]">Do not use the links, numbers, or names in a scenario as evidence that something is safe or dangerous. Verify the exact contact using a trusted official source.</p>
+            <a className="inline-link mt-3" href="https://semakmule.rmp.gov.my" target="_blank" rel="noreferrer">Open PDRM Semak Mule <span aria-hidden="true">→</span></a>
           </div>
         </div>
 
@@ -130,7 +126,7 @@ function SelectedThreat({ threat }: { threat: Threat | null }) {
   return (
     <div className="terminal-panel hot scroll-reveal">
       <div className="panel-title px-4 py-3">
-        <span>Knock details</span>
+        <span>Scenario notes</span>
         <span className={`protocol-chip px-2 py-0.5 ${tone.chip}`}>{threat.severity}</span>
       </div>
       <div className="p-4">
@@ -140,8 +136,8 @@ function SelectedThreat({ threat }: { threat: Threat | null }) {
           <DetailRow label="Target" value={threat.target} />
           <DetailRow label="Vector" value={threat.vector} />
           <DetailRow label="Reports" value={String(threat.reports)} />
-          <DetailRow label="Observed" value={formatDate(threat.timestamp)} />
-          <DetailRow label="Status" value={threat.status.toUpperCase()} />
+          <DetailRow label="Example date" value={formatDate(threat.timestamp)} />
+          <DetailRow label="Use" value="LEARNING ONLY" />
         </div>
       </div>
     </div>
@@ -156,7 +152,7 @@ function PatternWall({ patterns }: { patterns: Pattern[] }) {
       <div className="panel-title px-4 py-3">
         <span className="flex items-center gap-2">
           <Radio className="h-4 w-4" />
-          Pattern wall
+          Pattern guide
         </span>
         <span className="protocol-chip active px-2 py-0.5">MY</span>
       </div>

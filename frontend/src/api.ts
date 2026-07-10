@@ -6,12 +6,18 @@ async function request<T>(path: string, options?: RequestInit): Promise<T> {
       headers: { 'Content-Type': 'application/json' },
       ...options,
     });
-    if (!res.ok) throw new Error(`API error: ${res.status}`);
+    if (!res.ok) {
+      const payload = await res.json().catch(() => null);
+      throw new Error(payload?.detail || `Request failed (${res.status})`);
+    }
     return res.json();
-  } catch {
-    const fallback = FALLBACKS[path];
-    if (fallback) return fallback as T;
-    throw new Error('Backend offline — run start.sh to enable live analysis');
+  } catch (error) {
+    if (error instanceof TypeError) {
+      const fallback = FALLBACKS[path];
+      if (fallback) return fallback as T;
+      throw new Error('Backend unavailable — showing local practice responses where possible.');
+    }
+    throw error;
   }
 }
 
@@ -204,8 +210,9 @@ export const api = {
         method: 'POST',
         body: JSON.stringify({ url }),
       });
-    } catch {
-      return demoURLAnalysis(url);
+    } catch (error) {
+      if (error instanceof Error && error.message.startsWith('Backend unavailable')) return demoURLAnalysis(url);
+      throw error;
     }
   },
 
@@ -215,8 +222,9 @@ export const api = {
         method: 'POST',
         body: JSON.stringify({ text }),
       });
-    } catch {
-      return demoTextAnalysis(text);
+    } catch (error) {
+      if (error instanceof Error && error.message.startsWith('Backend unavailable')) return demoTextAnalysis(text);
+      throw error;
     }
   },
 
@@ -247,11 +255,12 @@ export const api = {
         method: 'POST',
         body: JSON.stringify(data),
       });
-    } catch {
+    } catch (error) {
+      if (!(error instanceof Error) || !error.message.startsWith('Backend unavailable')) throw error;
       return {
         report_id: `DEMO-${Date.now().toString(36).toUpperCase()}`,
         status: 'demo',
-        message: 'Report recorded in demo mode. In production, this would be forwarded to MyCERT / Cyber999.',
+        message: 'Report recorded in demo mode only. It was not forwarded to an agency. Use the official action pathways for urgent or formal reporting.',
       };
     }
   },

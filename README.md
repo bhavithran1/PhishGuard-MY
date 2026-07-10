@@ -1,57 +1,74 @@
-# PhishGuard MY
+# PhishGuard MY — Student Edition
 
-AI-Powered Malaysian Phishing & Scam Detection Platform
+A student-led Malaysian scam-prevention learning platform. It helps students pause before clicking, recognise common scam cues, practise safe reasoning, and find the appropriate official next step.
 
-## Quick Start
+## What it offers
 
-### Prerequisites
-- Python 3.10+
-- Node.js 18+
+- Link and message safety checks for common Malaysia-specific scam signals
+- A practical learning path: pressure tactics, safe verification, and evidence preservation
+- A clearly labelled scenario library and “Spot the Phish” practice activity
+- A student-community scam-signal intake with a required sensitive-data acknowledgement
+- An urgent action guide linking to official services: NSRC, PDRM Semak Mule, and Cyber999
 
-### Backend
+## Important scope
+
+PhishGuard MY is decision support and educational software. It is **not** a bank, law-enforcement service, or official reporting channel, and it does not automatically forward reports to any agency. A low-risk result is not proof that a message or link is safe.
+
+For a financial loss in Malaysia, contact the relevant bank or provider immediately and call the National Scam Response Centre at **997**. For cyber incidents such as phishing or a data breach, use the official [Cyber999 channels](https://www.cybersecurity.my/portal-main/services/cyber999-overview). Before a transaction, check suspicious accounts or phone numbers through [PDRM Semak Mule](https://semakmule.rmp.gov.my).
+
+Never submit passwords, OTP/TACs, PINs, full card details, IC numbers, or other sensitive information.
+
+## Run locally
+
+Requirements: Python 3.10+ and Node.js 18+.
+
 ```bash
+# Terminal 1
 cd backend
 pip install -r requirements.txt
-python ml/train.py          # Train the ML model
-uvicorn main:app --port 8000  # Start API server
-```
+python ml/train.py
+uvicorn main:app --host 127.0.0.1 --port 8000
 
-### Frontend
-```bash
+# Terminal 2
 cd frontend
 npm install
 npm run dev
 ```
 
-Open http://localhost:5173
+Open the Vite URL printed by the frontend (normally `http://localhost:5173/PhishGuard-MY/`).
 
-## API Endpoints
+## Release configuration
 
-| Method | Endpoint | Description |
-|--------|----------|-------------|
-| POST | /api/analyze/url | Analyze URL for phishing |
-| POST | /api/analyze/text | Analyze SMS/email for scams |
-| POST | /api/report | Submit threat report |
-| GET | /api/stats | Dashboard statistics |
-| GET | /api/threats/feed | Live threat feed |
-| GET | /api/threats/patterns | Malaysian scam patterns |
-| GET | /api/health | Health check |
+The API accepts cross-origin requests only from local development URLs by default. Set the deployed frontend origin explicitly:
 
-## Project Structure
-
+```bash
+export CORS_ALLOW_ORIGINS="https://your-domain.example"
+export MAX_SESSION_RECORDS="1000"
 ```
-backend/
-  main.py              # FastAPI application
-  api/routes.py         # API endpoints
-  api/schemas.py        # Request/response models
-  ml/model.py           # PhishGuard ML model
-  ml/train.py           # Training pipeline
-  ml/feature_extraction.py  # URL feature engineering
-  ml/malaysian_patterns.py  # Malaysian scam detection
-  data/                 # Training datasets
 
-frontend/
-  src/App.tsx           # Main application
-  src/api.ts            # API client
-  src/components/       # React components
+`MAX_SESSION_RECORDS` is bounded between 100 and 10,000. The current prototype keeps only short-lived, in-memory aggregate analysis metadata. Raw analysis input is not added to telemetry. Reports are deliberately recorded as local metadata only and are lost when the process restarts.
+
+Before accepting real reports in production, implement and document: encrypted persistent storage, access control, retention/deletion policy, abuse controls and rate limiting, a designated review team, consent records, and a formally authorised official-agency handoff. Do not represent an integration as active until it has been agreed and tested with that organisation.
+
+## Verification
+
+```bash
+cd frontend && npm run build && npm run lint
+cd .. && PYTHONPATH=backend python -m compileall -q backend
 ```
+
+## API
+
+| Method | Endpoint | Purpose |
+| --- | --- | --- |
+| `POST` | `/api/analyze/url` | Analyse a link for phishing risk signals |
+| `POST` | `/api/analyze/text` | Analyse message text for scam patterns |
+| `POST` | `/api/report` | Record local-only report metadata |
+| `GET` | `/api/stats` | Session aggregate and illustrative practice data |
+| `GET` | `/api/threats/feed` | Educational scenario cards |
+| `GET` | `/api/threats/patterns` | Malaysian scam-pattern reference |
+| `GET` | `/api/cybersquad/challenge` | Practice challenge items |
+| `GET` | `/api/cybersquad/leaderboard` | Illustrative programme scoreboard |
+| `GET` | `/api/health` | Service health |
+
+The current dashboard, scenario cards, and CyberSquad scores are labelled illustrative. Treat official sources—not this demo data—as the source of current national incident statistics or active campaigns.

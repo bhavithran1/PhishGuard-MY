@@ -65,15 +65,15 @@ function HomeView({ onNavigate }: { onNavigate: (v: View) => void }) {
     <>
       <section className="scroll-reveal flex flex-col gap-4 border-b border-[var(--line-dim)] pb-4 lg:flex-row lg:items-end lg:justify-between">
         <div>
-          <p className="panel-kicker">Student-led initiative</p>
+          <p className="panel-kicker">Student-led practice space</p>
           <h2 className="glow-title mt-2 text-4xl sm:text-5xl">CYBERSQUAD MY</h2>
-          <p className="mono mt-2 text-sm uppercase tracking-[0.1em] text-[var(--muted)]">
-            Gamified scam hunting // university network // protect Malaysia together
+          <p className="mt-2 max-w-2xl text-sm leading-6 text-[var(--muted)]">
+            A prototype for peer-led scam awareness: learn patterns, practise spotting them, and build a healthier reporting culture on campus.
           </p>
         </div>
         <div className="mono flex w-fit items-center gap-2 border border-[var(--line)] bg-black/40 px-3 py-2 text-xs font-black uppercase text-[var(--green)]">
-          <span className="status-dot pulse-live" />
-          {stats ? `${stats.total_members.toLocaleString()} hunters active` : 'loading'}
+          <span className="status-dot" />
+          {stats ? `${stats.total_members.toLocaleString()} demo participants` : 'loading'}
         </div>
       </section>
 
@@ -95,7 +95,7 @@ function HomeView({ onNavigate }: { onNavigate: (v: View) => void }) {
           <h3 className="glow-title text-2xl">SPOT THE PHISH</h3>
           <p className="mono mt-2 text-sm text-[var(--green-soft)]">
             Interactive challenge — classify URLs and messages as scam or legit.
-            Earn XP, climb ranks, compete with other universities.
+            Build pattern recognition with immediate explanations — no real malicious links are opened.
           </p>
           <div className="mono mt-4 flex items-center gap-2 text-xs font-black uppercase text-[var(--amber)] transition group-hover:gap-3">
             Start challenge <ChevronRight className="h-4 w-4" />
@@ -106,10 +106,9 @@ function HomeView({ onNavigate }: { onNavigate: (v: View) => void }) {
           <div className="mb-4 grid h-12 w-12 place-items-center border border-[var(--green)] bg-black/50 text-[var(--green)]">
             <Trophy className="h-6 w-6" />
           </div>
-          <h3 className="glow-title text-2xl">LEADERBOARD</h3>
+          <h3 className="glow-title text-2xl">SAMPLE SCOREBOARD</h3>
           <p className="mono mt-2 text-sm text-[var(--green-soft)]">
-            University rankings, top hunters, and the CyberSquad progression system.
-            See who's leading the fight against scams.
+            A sample of how a future campus programme could recognise learning and community contribution. Names and scores are illustrative.
           </p>
           <div className="mono mt-4 flex items-center gap-2 text-xs font-black uppercase text-[var(--green)] transition group-hover:gap-3">
             View rankings <ChevronRight className="h-4 w-4" />
@@ -121,13 +120,13 @@ function HomeView({ onNavigate }: { onNavigate: (v: View) => void }) {
       <section className="mt-5 terminal-panel scroll-reveal p-6">
         <div className="panel-title px-0 pb-3 mb-4">
           <span className="flex items-center gap-2"><Zap className="h-4 w-4" /> How CyberSquad works</span>
-          <span className="protocol-chip px-2 py-0.5">OPEN</span>
+          <span className="protocol-chip px-2 py-0.5">PILOT</span>
         </div>
         <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
-          <Step num="01" title="Join" desc="Sign up with your university email. You start as a Recruit." />
-          <Step num="02" title="Hunt" desc="Play Spot the Phish challenges. Report scams you encounter in the wild. Earn XP." />
-          <Step num="03" title="Rank up" desc="Recruit → Analyst → Hunter → Sentinel → Guardian. Unlock badges and bragging rights." />
-          <Step num="04" title="Protect" desc="Your reports feed into PhishGuard MY's detection engine. Every report makes Malaysia safer." />
+          <Step num="01" title="Learn" desc="Start with short lessons and take the Spot the Phish drill at your own pace." />
+          <Step num="02" title="Discuss" desc="Compare reasoning with peers. Focus on cues, not on blaming people who were targeted." />
+          <Step num="03" title="Verify" desc="Use official channels before a transaction or whenever there is a possible loss." />
+          <Step num="04" title="Support" desc="Help your campus share accurate, privacy-respecting scam prevention guidance." />
         </div>
       </section>
 
@@ -154,11 +153,10 @@ function HomeView({ onNavigate }: { onNavigate: (v: View) => void }) {
       <section className="mt-5 terminal-panel scroll-reveal p-6">
         <div className="panel-title px-0 pb-3 mb-4">
           <span className="flex items-center gap-2"><GraduationCap className="h-4 w-4" /> University network</span>
-          <span className="protocol-chip active px-2 py-0.5">8 IPTA</span>
+          <span className="protocol-chip active px-2 py-0.5">PILOT IDEA</span>
         </div>
         <p className="mono mb-4 text-sm text-[var(--green-soft)]">
-          CyberSquad MY launches across 8 Malaysian universities. Each campus runs a sentinel node
-          — students monitor, report, and protect their community.
+          A future rollout could bring together student societies across Malaysian campuses. These names are planning examples, not participating organisations or active nodes.
         </p>
         <div className="grid gap-2 sm:grid-cols-2 lg:grid-cols-4">
           {['UM — Kuala Lumpur', 'UTM — Johor Bahru', 'UKM — Bangi', 'USM — Penang', 'UPM — Serdang', 'UiTM — Shah Alam', 'IIUM — Gombak', 'MMU — Cyberjaya'].map(uni => (

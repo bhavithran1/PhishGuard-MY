@@ -17,8 +17,6 @@ import type { TextAnalysis, URLAnalysis } from '../api';
 type AnalysisMode = 'url' | 'text';
 type Result = { mode: 'url'; data: URLAnalysis } | { mode: 'text'; data: TextAnalysis };
 
-const protocolFilters = ['ALL', 'URL', 'SMS', 'EMAIL', 'QR', 'BANK', 'GOV', 'EWALLET'];
-
 const urlSamples = [
   { label: 'MAYBANK', value: 'http://maybank2u-login.tk/verify' },
   { label: 'PDRM', value: 'https://pdrm-saman.xyz/bayar-denda' },
@@ -42,13 +40,13 @@ const textSamples = [
 ];
 
 const feedRows = [
-  { place: 'Kuala Lumpur, Malaysia', tag: 'SMS', line: 'user: bank customer  bait: TAC expired', tone: 'text-[var(--green)]' },
-  { place: 'Shah Alam, Malaysia', tag: 'URL', line: 'path: /login/verify  host: maybank2u-login.tk', tone: 'text-[var(--cyan)]' },
-  { place: 'Johor Bahru, Malaysia', tag: 'QR', line: 'method: payment redirect  brand: duitnow', tone: 'text-[var(--amber)]' },
-  { place: 'Penang, Malaysia', tag: 'MAIL', line: 'subject: tax refund  sender: lhdn-portal', tone: 'text-[var(--magenta)]' },
+  { place: 'Urgency', tag: 'PAUSE', line: '“Pay now”, “account suspended”, or a countdown designed to rush you.', tone: 'text-[var(--amber)]' },
+  { place: 'Impersonation', tag: 'VERIFY', line: 'A familiar bank, agency or delivery brand paired with an unusual domain.', tone: 'text-[var(--cyan)]' },
+  { place: 'Payment pressure', tag: 'STOP', line: 'Requests for OTP/TAC, deposits, cryptocurrency, gift cards or unknown transfers.', tone: 'text-[var(--red)]' },
+  { place: 'Too good to be true', tag: 'CHECK', line: 'Easy jobs, prizes, refunds or investment returns with no independent verification.', tone: 'text-[var(--magenta)]' },
 ];
 
-export default function Analyzer() {
+export default function Analyzer({ onGetHelp }: { onGetHelp: () => void }) {
   const [mode, setMode] = useState<AnalysisMode>('url');
   const [input, setInput] = useState('');
   const [loading, setLoading] = useState(false);
@@ -90,28 +88,16 @@ export default function Analyzer() {
         <div className="scroll-reveal">
           <div className="flex flex-wrap items-start justify-between gap-5 border-b border-[var(--line-dim)] pb-4">
             <div>
-              <h2 className="glow-title text-4xl leading-none sm:text-5xl lg:text-6xl">
-                SCAMS ARE KNOCKING
-                <span className="ml-3 inline-block h-4 w-4 rounded-full bg-[var(--green)] shadow-[0_0_18px_var(--green)] pulse-live" />
-              </h2>
-              <p className="mono mt-3 text-base font-black uppercase tracking-[0.12em] text-[var(--green-soft)]">
-                ... but they do not get the click.
+              <p className="eyebrow">A safer next step for students</p>
+              <h1 className="glow-title mt-2 text-4xl leading-none sm:text-5xl lg:text-6xl">CHECK BEFORE<br />YOU CLICK.</h1>
+              <p className="mt-4 max-w-2xl text-base leading-7 text-[var(--green-soft)]">
+                Paste a suspicious link or message for a quick learning-oriented risk check. Do not open the link, log in through it, or share any OTP/TAC.
               </p>
             </div>
-            <div className="mono grid min-w-56 gap-1 text-right text-sm font-black uppercase text-[var(--amber)]">
-              <span>Total scans: live</span>
-              <span>Per min: adaptive</span>
-              <span>Last: just now</span>
+            <div className="hidden min-w-52 text-right text-sm leading-6 text-[var(--green-soft)] sm:block">
+              <p className="font-bold text-[var(--amber)]">Already sent money?</p>
+              <button onClick={onGetHelp} className="inline-link mt-1">Open urgent steps →</button>
             </div>
-          </div>
-
-          <div className="mt-4 flex flex-wrap items-center gap-2">
-            <span className="panel-kicker mr-1">Filter by protocol:</span>
-            {protocolFilters.map((filter, index) => (
-              <button key={filter} className={`protocol-chip px-2.5 py-1 ${index === 0 ? 'active' : ''}`}>
-                {filter}
-              </button>
-            ))}
           </div>
         </div>
 
@@ -121,9 +107,9 @@ export default function Analyzer() {
               <Shield className="h-6 w-6" />
             </div>
             <div>
-              <p className="panel-kicker">Malaysia signal profile</p>
+              <p className="panel-kicker">Privacy-first check</p>
               <p className="mono mt-1 text-sm leading-6 text-[var(--green-soft)]">
-                Banks, e-wallets, enforcement notices, fake refunds, QR redirects.
+                We use your input to produce this check. Avoid personal data and never paste passwords, OTPs, TACs, PINs or card numbers.
               </p>
             </div>
           </div>
@@ -135,21 +121,21 @@ export default function Analyzer() {
 
         <div className="terminal-panel scroll-reveal">
           <div className="panel-title px-4 py-3">
-            <span>Scanner console</span>
-            <span className="protocol-chip active px-2 py-0.5">{mode === 'url' ? 'URL' : 'TEXT'}</span>
+            <span>Safety check</span>
+            <span className="protocol-chip active px-2 py-0.5">{mode === 'url' ? 'LINK' : 'MESSAGE'}</span>
           </div>
           <div className="p-4">
             <div className="mb-4 grid grid-cols-2 gap-2">
               <ModeButton
                 active={mode === 'url'}
                 icon={<Link2 className="h-4 w-4" />}
-                label="URL"
+                label="LINK / URL"
                 onClick={() => setModeCleanly('url')}
               />
               <ModeButton
                 active={mode === 'text'}
                 icon={<MessageSquare className="h-4 w-4" />}
-                label="SMS / EMAIL"
+                label="MESSAGE"
                 onClick={() => setModeCleanly('text')}
               />
             </div>
@@ -161,8 +147,9 @@ export default function Analyzer() {
                   value={input}
                   onChange={e => setInput(e.target.value)}
                   onKeyDown={e => e.key === 'Enter' && analyze()}
-                  placeholder="https://target.example/login"
+                  placeholder="Paste a link — do not open it first"
                   className="field min-h-12 px-3 py-3 text-sm"
+                  maxLength={2048}
                 />
                 <button
                   onClick={analyze}
@@ -170,7 +157,7 @@ export default function Analyzer() {
                   className="button-primary min-h-12 px-5 text-sm"
                 >
                   <Search className="h-4 w-4" />
-                  Scan
+                  Check link
                 </button>
               </div>
             ) : (
@@ -178,9 +165,10 @@ export default function Analyzer() {
                 <textarea
                   value={input}
                   onChange={e => setInput(e.target.value)}
-                  placeholder="Paste suspicious message content"
+                  placeholder="Paste the message text. Remove personal details first."
                   rows={6}
                   className="field resize-none px-3 py-3 text-sm leading-6"
+                  maxLength={10000}
                 />
                 <button
                   onClick={analyze}
@@ -188,13 +176,13 @@ export default function Analyzer() {
                   className="button-primary min-h-12 px-5 text-sm sm:w-fit"
                 >
                   <Search className="h-4 w-4" />
-                  Scan text
+                  Check message
                 </button>
               </div>
             )}
 
             <div className="mt-4 flex flex-wrap items-center gap-2">
-              <span className="panel-kicker">Samples</span>
+              <span className="panel-kicker">Safe practice examples</span>
               {samples.map(sample => (
                 <button key={sample.label} onClick={() => setInput(sample.value)} className="button-ghost px-2.5 py-1.5 text-xs">
                   {sample.label}
@@ -205,7 +193,7 @@ export default function Analyzer() {
             {loading && (
               <div className="mono mt-5 flex items-center gap-3 text-sm font-black uppercase text-[var(--amber)]">
                 <div className="h-4 w-4 rounded-full border-2 border-[rgba(255,211,90,0.35)] border-t-[var(--amber)] animate-spin" />
-                Inspecting payload...
+                Checking for common risk signals...
               </div>
             )}
 
@@ -236,8 +224,8 @@ function LiveFeedPanel() {
   return (
     <div className="terminal-panel scroll-reveal">
       <div className="panel-title px-4 py-3">
-        <span>Live feed: hostile lures</span>
-        <span className="protocol-chip active px-2 py-0.5">ALL</span>
+        <span>Four cues to notice</span>
+        <span className="protocol-chip active px-2 py-0.5">LEARN</span>
       </div>
       <div className="divide-y divide-[var(--line-dim)]">
         {feedRows.map(row => (
@@ -247,7 +235,7 @@ function LiveFeedPanel() {
               <span className="protocol-chip px-1.5 py-0.5 text-[0.62rem]">{row.tag}</span>
             </div>
             <p className="mono text-xs leading-5 text-[var(--green-soft)]">{row.line}</p>
-            <p className="mono mt-1 text-xs text-[var(--cyan)]">reported by: MY-SENSOR</p>
+            <p className="mono mt-1 text-xs text-[var(--muted)]">One cue alone is not proof. Several cues together are a reason to verify independently.</p>
           </div>
         ))}
       </div>
@@ -256,50 +244,31 @@ function LiveFeedPanel() {
 }
 
 function SignalPanel() {
-  const rows = [
-    { label: 'Banking', width: '92%' },
-    { label: 'E-wallet', width: '74%' },
-    { label: 'Enforcement', width: '61%' },
-    { label: 'Delivery', width: '48%' },
-    { label: 'Tax refund', width: '42%' },
-  ];
-
   return (
     <div className="grid gap-4">
       <div className="terminal-panel scroll-reveal p-4">
         <div className="mb-3 flex items-center justify-between">
           <h3 className="panel-kicker flex items-center gap-2">
             <Globe2 className="h-4 w-4" />
-            Globe view
+            What this can do
           </h3>
-          <span className="protocol-chip active px-2 py-0.5">HEAT</span>
+          <span className="protocol-chip active px-2 py-0.5">GUIDE</span>
         </div>
-        <div className="threat-globe" />
-        <div className="mono mt-3 flex justify-between text-xs font-black uppercase text-[var(--amber)]">
-          <span>low</span>
-          <span>malaysia lure map</span>
-          <span>high</span>
-        </div>
+        <p className="text-sm leading-6 text-[var(--green-soft)]">Highlights suspicious wording, domains and scam patterns commonly seen in Malaysia.</p>
+        <p className="mt-3 border-t border-[var(--line-dim)] pt-3 text-xs leading-5 text-[var(--muted)]">It cannot prove a sender is genuine or replace your bank, provider, or an official report.</p>
       </div>
 
       <div className="terminal-panel scroll-reveal p-4">
         <h3 className="panel-kicker mb-4 flex items-center gap-2">
           <DatabaseZap className="h-4 w-4" />
-          Target pressure
+          A safer verification routine
         </h3>
-        <div className="grid gap-3">
-          {rows.map(row => (
-            <div key={row.label}>
-              <div className="mono mb-1 flex justify-between text-xs font-black text-[var(--green-soft)]">
-                <span>{row.label}</span>
-                <span>{row.width}</span>
-              </div>
-              <div className="rank-bar">
-                <span style={{ width: row.width }} />
-              </div>
-            </div>
-          ))}
-        </div>
+        <ol className="grid gap-3 pl-4 text-sm leading-5 text-[var(--green-soft)] marker:text-[var(--amber)]">
+          <li>Pause — do not click or reply under pressure.</li>
+          <li>Use an official app or saved contact to verify.</li>
+          <li>Check a payee or phone via PDRM Semak Mule before any transfer.</li>
+          <li>Keep evidence and use official help if money or credentials were shared.</li>
+        </ol>
       </div>
     </div>
   );
@@ -348,6 +317,7 @@ function URLResult({ data }: { data: URLAnalysis }) {
         level={data.risk_level}
       />
       <RiskMeter label="Threat confidence" percent={score} tone={tone.fill} />
+      <p className="mt-3 text-xs leading-5 text-[var(--muted)]">Treat this as a prompt to verify through an official channel, not proof that a link is safe or unsafe.</p>
       {data.risk_factors.length > 0 && (
         <div className="mt-4 grid gap-2">
           {data.risk_factors.map((factor, i) => (
@@ -381,6 +351,7 @@ function TextResult({ data }: { data: TextAnalysis }) {
         level={data.risk_level}
       />
       <RiskMeter label="Risk score" percent={score} tone={tone.fill} />
+      <p className="mt-3 text-xs leading-5 text-[var(--muted)]">Treat this as a prompt to verify through an official channel, not proof that a sender is genuine.</p>
 
       <div className="mt-4 grid gap-2 sm:grid-cols-3">
         <Indicator label="Urgency" active={data.urgency_detected} />
