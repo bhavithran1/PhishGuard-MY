@@ -1,4 +1,4 @@
-import { lazy, Suspense, useState } from 'react';
+import { lazy, Suspense, useEffect, useRef, useState } from 'react';
 import Header from './components/Header';
 
 const Analyzer = lazy(() => import('./components/Analyzer'));
@@ -8,30 +8,51 @@ const Report = lazy(() => import('./components/Report'));
 const CyberSquad = lazy(() => import('./components/CyberSquad'));
 const ActionPlan = lazy(() => import('./components/ActionPlan'));
 const Learn = lazy(() => import('./components/Learn'));
+const Events = lazy(() => import('./components/Events'));
 
 function App() {
   const [activeTab, setActiveTab] = useState('analyzer');
+  const mainRef = useRef<HTMLElement>(null);
+
+  const navigate = (tab: string) => {
+    setActiveTab(tab);
+    window.scrollTo({ top: 0, behavior: 'smooth' });
+    window.requestAnimationFrame(() => mainRef.current?.focus({ preventScroll: true }));
+  };
+
+  useEffect(() => {
+    const labels: Record<string, string> = {
+      analyzer: 'Check a scam', learn: 'Learn', threats: 'Scam library', report: 'Contribute',
+      cybersquad: 'Campus challenge', action: 'Urgent help', dashboard: 'Practice data', events: 'Events',
+    };
+    document.title = `${labels[activeTab] ?? 'PhishGuard'} — PhishGuard MY`;
+  }, [activeTab]);
 
   return (
     <div className="app-chrome min-h-screen text-[var(--ink)]">
+      <a href="#main-content" className="skip-link">Skip to main content</a>
       <div className="scroll-progress" />
-      <Header activeTab={activeTab} onTabChange={setActiveTab} onGetHelp={() => setActiveTab('action')} />
-      <main className="px-3 py-5 sm:px-5 lg:px-7">
+      <Header activeTab={activeTab} onTabChange={navigate} onGetHelp={() => navigate('action')} />
+      <main id="main-content" ref={mainRef} tabIndex={-1} className="px-4 py-7 outline-none sm:px-6 lg:px-8 lg:py-10">
         <Suspense fallback={<LoadingView />}>
-          {activeTab === 'analyzer' && <Analyzer onGetHelp={() => setActiveTab('action')} />}
-          {activeTab === 'learn' && <Learn onNavigate={setActiveTab} />}
+          {activeTab === 'analyzer' && <Analyzer onGetHelp={() => navigate('action')} onNavigate={navigate} />}
+          {activeTab === 'learn' && <Learn onNavigate={navigate} />}
+          {activeTab === 'events' && <Events onNavigate={navigate} />}
           {activeTab === 'dashboard' && <Dashboard />}
           {activeTab === 'threats' && <ThreatFeed />}
           {activeTab === 'report' && <Report />}
           {activeTab === 'cybersquad' && <CyberSquad />}
-          {activeTab === 'action' && <ActionPlan onNavigate={setActiveTab} />}
+          {activeTab === 'action' && <ActionPlan onNavigate={navigate} />}
         </Suspense>
       </main>
-      <footer className="border-t border-[var(--line-dim)] bg-black/15 px-4 py-7 text-center">
-        <p className="mono text-[0.68rem] font-bold uppercase tracking-[0.13em] text-[var(--green-soft)]">
-          PhishGuard MY · a student-led learning and prevention project
+      <footer className="site-footer px-4 py-10 text-center">
+        <p className="footer-mission mx-auto max-w-2xl text-base font-black text-white">
+          A student-led movement to help each other spot scams before the next click.
         </p>
-        <p className="mx-auto mt-2 max-w-3xl text-xs leading-5 text-[var(--muted)]">
+        <p className="mt-2 text-sm font-bold text-[var(--green)]">
+          PhishGuard MY · by students, for students
+        </p>
+        <p className="mx-auto mt-3 max-w-3xl text-xs leading-5 text-[var(--muted)]">
           This tool supports safer decisions; it is not a guarantee, bank, law-enforcement service, or official reporting channel. Never share passwords, OTPs, TACs, PINs, or card details.
         </p>
       </footer>

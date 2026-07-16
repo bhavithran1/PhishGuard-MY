@@ -16,6 +16,8 @@ export default function ThreatFeed() {
   const [patterns, setPatterns] = useState<Pattern[]>([]);
   const [loading, setLoading] = useState(true);
   const [selectedThreat, setSelectedThreat] = useState<Threat | null>(null);
+  const [query, setQuery] = useState('');
+  const [filter, setFilter] = useState<'all' | 'sms' | 'banking' | 'jobs' | 'social'>('all');
 
   useEffect(() => {
     Promise.all([api.getThreats(), api.getPatterns()])
@@ -36,12 +38,23 @@ export default function ThreatFeed() {
     );
   }
 
+  const filterTerms: Record<typeof filter, string[]> = {
+    all: [], sms: ['sms'], banking: ['bank', 'maybank', 'lhdn', 'ewallet', 'duitnow'],
+    jobs: ['job', 'work-from-home'], social: ['social', 'whatsapp', 'crypto', 'romance'],
+  };
+  const visibleThreats = threats.filter(threat => {
+    const haystack = `${threat.title} ${threat.description} ${threat.vector} ${threat.type}`.toLowerCase();
+    const matchesQuery = !query.trim() || haystack.includes(query.toLowerCase());
+    const matchesFilter = filter === 'all' || filterTerms[filter].some(term => haystack.includes(term));
+    return matchesQuery && matchesFilter;
+  });
+
   return (
     <div className="mx-auto max-w-[1500px]">
       <section className="scroll-reveal flex flex-col gap-4 border-b border-[var(--line-dim)] pb-4 lg:flex-row lg:items-end lg:justify-between">
         <div>
           <p className="panel-kicker">Practice scenario library</p>
-          <h2 className="glow-title mt-2 text-4xl sm:text-5xl">SCAM PATTERNS</h2>
+          <h1 className="glow-title mt-2 text-4xl sm:text-5xl">Scam patterns</h1>
           <p className="mt-2 max-w-2xl text-sm leading-6 text-[var(--muted)]">
             Illustrative Malaysian scam scenarios for learning and discussion. They are not a real-time alert feed or a list of verified active campaigns.
           </p>
@@ -58,13 +71,19 @@ export default function ThreatFeed() {
             <span>Scenario cards</span>
             <span className="protocol-chip active px-2 py-0.5">EDUCATION</span>
           </div>
+          <div className="scenario-filters">
+            <label htmlFor="scenario-search">Find a situation</label>
+            <input id="scenario-search" value={query} onChange={event => setQuery(event.target.value)} className="field min-h-11 px-3 text-base" placeholder="Try “parcel”, “job” or “bank”" />
+            <div className="scenario-filter-chips" aria-label="Filter scenarios">{(['all', 'sms', 'banking', 'jobs', 'social'] as const).map(option => <button key={option} aria-pressed={filter === option} onClick={() => setFilter(option)}>{option === 'all' ? 'All' : option[0].toUpperCase() + option.slice(1)}</button>)}</div>
+          </div>
           <div className="divide-y divide-[var(--line-dim)]">
-            {threats.map(threat => {
+            {visibleThreats.map(threat => {
               const tone = severityTone(threat.severity);
               const isSelected = selectedThreat?.id === threat.id;
               return (
+                <div key={threat.id}>
                 <button
-                  key={threat.id}
+                  aria-pressed={isSelected}
                   onClick={() => setSelectedThreat(threat)}
                   className={`block w-full p-4 text-left transition hover:bg-[rgba(101,255,105,0.045)] ${
                     isSelected ? 'bg-[rgba(255,211,90,0.08)]' : ''
@@ -72,7 +91,7 @@ export default function ThreatFeed() {
                 >
                   <div className="mb-2 flex items-start justify-between gap-3">
                     <div className="min-w-0">
-                      <h3 className={`mono truncate text-sm font-black ${tone.text}`}>{threat.title}</h3>
+                      <h3 className={`text-sm font-extrabold leading-5 ${tone.text}`}>{threat.title}</h3>
                       <p className="mono mt-1 text-xs leading-5 text-[var(--green-soft)]">{threat.description}</p>
                     </div>
                     <span className={`protocol-chip shrink-0 px-1.5 py-0.5 text-[0.62rem] ${tone.chip}`}>
@@ -86,12 +105,15 @@ export default function ThreatFeed() {
                     <Meta icon={<Clock className="h-3.5 w-3.5" />} label={formatDate(threat.timestamp)} />
                   </div>
                 </button>
+                {isSelected && <div className="mobile-threat-detail"><SelectedThreat threat={threat} /></div>}
+                </div>
               );
             })}
+            {visibleThreats.length === 0 && <div className="p-6 text-center text-sm text-[var(--muted)]">No scenario matches that search. Try a broader word.</div>}
           </div>
         </div>
 
-        <div className="grid gap-4 content-start">
+        <div className="desktop-threat-detail grid gap-4 content-start">
           <SelectedThreat threat={selectedThreat} />
           <div className="terminal-panel scroll-reveal p-4">
             <div className="mb-3 flex items-center justify-between">

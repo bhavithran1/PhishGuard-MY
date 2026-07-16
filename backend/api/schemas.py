@@ -15,19 +15,27 @@ class TextAnalysisRequest(BaseModel):
 
 class ReportRequest(BaseModel):
     model_config = ConfigDict(extra="forbid", str_strip_whitespace=True)
-    type: Literal["url", "sms", "email", "qr"]
-    content: str = Field(min_length=1, max_length=10_000)
-    reporter_email: str | None = Field(default=None, max_length=254)
-    description: str | None = Field(default=None, max_length=2_000)
+    type: Literal["url", "sms", "email", "qr", "social", "call", "other"]
+    route: Literal["signal", "urgent", "vulnerability"]
+    incident_type: Literal[
+        "phishing", "fraud", "malware", "account_takeover",
+        "data_breach", "vulnerability", "other",
+    ]
+    content_hash: str = Field(pattern=r"^[a-f0-9]{64}$")
+    content_length: int = Field(ge=1, le=4_800)
+    impersonated_entity: str | None = Field(default=None, max_length=120)
+    first_seen: str | None = Field(default=None, max_length=40)
+    state: str | None = Field(default=None, max_length=60)
+    consent_to_review: Literal[True]
 
-    @field_validator("reporter_email")
+    @field_validator("first_seen")
     @classmethod
-    def validate_email_shape(cls, value: str | None) -> str | None:
+    def validate_first_seen_shape(cls, value: str | None) -> str | None:
         if value is None or value == "":
             return None
-        if "@" not in value or value.startswith("@") or value.endswith("@"):
-            raise ValueError("Enter a valid callback email address")
-        return value.lower()
+        if "T" not in value:
+            raise ValueError("Use a date and time value")
+        return value
 
 
 class URLAnalysisResponse(BaseModel):
@@ -55,3 +63,5 @@ class ReportResponse(BaseModel):
     report_id: str
     status: str
     message: str
+    duplicate_count: int
+    official_route: Literal["cyber999", "nsrc_997", "mycert_cvd"]

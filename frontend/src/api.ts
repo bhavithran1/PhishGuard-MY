@@ -201,6 +201,20 @@ export interface ReportResponse {
   report_id: string;
   status: string;
   message: string;
+  duplicate_count: number;
+  official_route: 'cyber999' | 'nsrc_997' | 'mycert_cvd';
+}
+
+export interface ContributionRequest {
+  type: 'url' | 'sms' | 'email' | 'qr' | 'social' | 'call' | 'other';
+  route: 'signal' | 'urgent' | 'vulnerability';
+  incident_type: 'phishing' | 'fraud' | 'malware' | 'account_takeover' | 'data_breach' | 'vulnerability' | 'other';
+  content_hash: string;
+  content_length: number;
+  impersonated_entity?: string;
+  first_seen?: string;
+  state?: string;
+  consent_to_review: true;
 }
 
 export const api = {
@@ -244,12 +258,7 @@ export const api = {
       }[];
     }>('/threats/patterns'),
 
-  submitReport: async (data: {
-    type: string;
-    content: string;
-    reporter_email?: string;
-    description?: string;
-  }): Promise<ReportResponse> => {
+  submitReport: async (data: ContributionRequest): Promise<ReportResponse> => {
     try {
       return await request<ReportResponse>('/report', {
         method: 'POST',
@@ -258,9 +267,11 @@ export const api = {
     } catch (error) {
       if (!(error instanceof Error) || !error.message.startsWith('Backend unavailable')) throw error;
       return {
-        report_id: `DEMO-${Date.now().toString(36).toUpperCase()}`,
-        status: 'demo',
-        message: 'Report recorded in demo mode only. It was not forwarded to an agency. Use the official action pathways for urgent or formal reporting.',
+        report_id: `PACK-${Date.now().toString(36).toUpperCase()}`,
+        status: 'offline',
+        duplicate_count: 0,
+        official_route: data.route === 'urgent' ? 'nsrc_997' : data.route === 'vulnerability' ? 'mycert_cvd' : 'cyber999',
+        message: 'The community queue is offline, so no metadata was stored. Your evidence pack is still ready for the official route and remains in this browser.',
       };
     }
   },

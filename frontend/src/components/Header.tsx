@@ -1,4 +1,4 @@
-import { BookOpen, FileText, HeartHandshake, Radio, ScanLine, Search, Shield, Swords } from 'lucide-react';
+import { BookOpen, CalendarDays, FileText, HeartHandshake, Radio, Search, ShieldCheck, Trophy } from 'lucide-react';
 
 export default function Header({
   activeTab,
@@ -10,29 +10,29 @@ export default function Header({
   onGetHelp: () => void;
 }) {
   const tabs = [
-    { id: 'analyzer', label: 'Check', icon: Search },
+    { id: 'analyzer', label: 'Check a scam', icon: Search },
     { id: 'learn', label: 'Learn', icon: BookOpen },
-    { id: 'threats', label: 'Alerts', icon: Radio },
-    { id: 'report', label: 'Report', icon: FileText },
-    { id: 'cybersquad', label: 'Campus', icon: Swords },
+    { id: 'threats', label: 'Scam library', icon: Radio },
+    { id: 'events', label: 'Events', icon: CalendarDays },
+    { id: 'report', label: 'Contribute', icon: FileText },
+    { id: 'cybersquad', label: 'Leaderboard', icon: Trophy },
   ];
 
   return (
-    <header className="sticky top-0 z-50 border-b border-[var(--line-dim)] bg-[#050605]/90 backdrop-blur-xl">
-      <div className="mx-auto flex max-w-[1500px] flex-col gap-3 px-3 py-3 sm:px-5 lg:flex-row lg:items-center lg:justify-between lg:px-7">
+    <header className="site-header sticky top-0 z-50">
+      <div className="mx-auto flex max-w-[1320px] flex-col gap-3 px-4 py-3 sm:px-6 lg:flex-row lg:items-center lg:justify-between lg:px-8">
         <div className="flex items-center justify-between gap-3">
           <div className="flex items-center gap-3">
-            <div className="grid h-10 w-10 place-items-center rounded-[4px] border border-[var(--line)] bg-[rgba(101,255,105,0.08)] text-[var(--green)] shadow-[0_0_18px_rgba(101,255,105,0.12)]">
-              <Shield className="h-5 w-5" />
+            <div className="brand-mark">
+              <ShieldCheck className="h-5 w-5" />
             </div>
             <div>
-              <div className="glow-title flex items-center gap-2 text-lg leading-none">
-                PHISHGUARD MY
-                <span className="protocol-chip px-1.5 py-0.5 text-[0.58rem]">STUDENT EDITION</span>
+              <div className="flex items-center gap-2 text-base font-black leading-none text-[var(--ink)]">
+                PhishGuard <span className="text-[var(--green)]">MY</span>
+                <span className="brand-chip">For students</span>
               </div>
-              <div className="mono mt-1 flex items-center gap-2 text-[0.68rem] uppercase tracking-[0.14em] text-[var(--muted)]">
-                <ScanLine className="h-3 w-3" />
-                semak dulu · bantu kawan · lindungi komuniti
+              <div className="mt-1 text-[0.68rem] font-semibold text-[var(--muted)]">
+                By students, for students
               </div>
             </div>
           </div>
@@ -42,7 +42,7 @@ export default function Header({
           </button>
         </div>
 
-        <nav className="grid grid-cols-5 gap-1.5 lg:flex lg:items-center">
+        <nav aria-label="Primary navigation" className="nav-shell mobile-dock grid grid-cols-6 gap-1 lg:flex lg:items-center">
           {tabs.map(tab => (
             <TabButton
               key={tab.id}
@@ -77,11 +77,12 @@ function TabButton({
   return (
     <button
       aria-label={label}
+      aria-current={active ? 'page' : undefined}
       onClick={onClick}
-      className={`mono flex min-h-10 items-center justify-center gap-2 border px-3 text-xs font-black uppercase tracking-[0.12em] transition ${
+      className={`nav-item flex min-h-10 items-center justify-center gap-2 px-3 text-xs font-bold transition ${
         active
-          ? 'border-[var(--amber)] bg-[var(--amber)] text-black shadow-[0_0_18px_rgba(255,211,90,0.24)]'
-          : 'border-[var(--line-dim)] bg-black/35 text-[var(--muted)] hover:border-[var(--green)] hover:text-[var(--green)]'
+          ? 'active text-[var(--ink)]'
+          : 'text-[var(--muted)] hover:text-[var(--ink)]'
       }`}
     >
       <Icon className="h-4 w-4" />

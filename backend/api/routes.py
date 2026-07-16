@@ -64,20 +64,37 @@ async def analyze_text(request: TextAnalysisRequest):
 @router.post("/report", response_model=ReportResponse)
 async def submit_report(request: ReportRequest):
     report_id = f"PG-{uuid.uuid4().hex[:8].upper()}"
+    duplicate_count = sum(
+        1 for existing_report in reports
+        if existing_report["content_hash"] == request.content_hash
+    )
+    official_route = {
+        "signal": "cyber999",
+        "urgent": "nsrc_997",
+        "vulnerability": "mycert_cvd",
+    }[request.route]
     report = {
         "report_id": report_id,
         "type": request.type,
-        "content_length": len(request.content),
-        "has_callback_email": request.reporter_email is not None,
-        "has_context": request.description is not None,
-        "status": "local_only",
+        "route": request.route,
+        "incident_type": request.incident_type,
+        "content_hash": request.content_hash,
+        "content_length": request.content_length,
+        "impersonated_entity": request.impersonated_entity,
+        "first_seen": request.first_seen,
+        "state": request.state,
+        "duplicate_count": duplicate_count,
+        "official_route": official_route,
+        "status": "pending_review",
         "timestamp": datetime.now().isoformat(),
     }
     _append_session_record(reports, report)
     return ReportResponse(
         report_id=report_id,
-        status="local_only",
-        message="Your report metadata was recorded in this local project session. It was not forwarded to any agency. Use the official action pathways for an urgent or formal report.",
+        status="pending_review",
+        duplicate_count=duplicate_count,
+        official_route=official_route,
+        message="Privacy-minimised signal metadata was queued for campus review. The evidence pack was not stored or forwarded; use the official handoff shown in the app.",
     )
 
 

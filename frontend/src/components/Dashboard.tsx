@@ -56,7 +56,7 @@ export default function Dashboard() {
       <section className="scroll-reveal flex flex-col gap-4 border-b border-[var(--line-dim)] pb-4 lg:flex-row lg:items-end lg:justify-between">
         <div>
           <p className="panel-kicker">Data literacy exercise</p>
-          <h2 className="glow-title mt-2 text-4xl sm:text-5xl">PRACTICE DATA</h2>
+          <h1 className="glow-title mt-2 text-4xl sm:text-5xl">Practice data</h1>
           <p className="mt-2 text-sm leading-6 text-[var(--muted)]">
             Illustrative data for discussing risk trends. It is not a live national telemetry feed or an official incident statistic.
           </p>

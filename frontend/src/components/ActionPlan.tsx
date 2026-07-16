@@ -3,11 +3,16 @@ import { useState } from 'react';
 import type { ReactNode } from 'react';
 
 export default function ActionPlan({ onNavigate }: { onNavigate: (tab: string) => void }) {
-  const [copied, setCopied] = useState(false);
+  const [copyStatus, setCopyStatus] = useState<'idle' | 'copied' | 'failed'>('idle');
   const copyChecklist = async () => {
-    await navigator.clipboard?.writeText('I was targeted by a scam. I have stopped contact, secured my account, and saved the relevant messages, transaction details, phone numbers, URLs, dates and times.');
-    setCopied(true);
-    window.setTimeout(() => setCopied(false), 1800);
+    try {
+      if (!navigator.clipboard) throw new Error('Clipboard unavailable');
+      await navigator.clipboard.writeText('I was targeted by a scam. I have stopped contact, secured my account, and saved the relevant messages, transaction details, phone numbers, URLs, dates and times.');
+      setCopyStatus('copied');
+      window.setTimeout(() => setCopyStatus('idle'), 1800);
+    } catch {
+      setCopyStatus('failed');
+    }
   };
 
   return (
@@ -41,15 +46,16 @@ export default function ActionPlan({ onNavigate }: { onNavigate: (tab: string) =
 
       <section className="mt-5 grid gap-4 lg:grid-cols-[1.15fr_.85fr]">
         <div className="terminal-panel scroll-reveal p-5 sm:p-6">
-          <div className="flex items-start justify-between gap-4">
+          <div className="flex flex-col items-start justify-between gap-4 sm:flex-row">
             <div>
               <p className="eyebrow">Evidence checklist</p>
               <h2 className="mt-1 text-2xl font-black text-white">Save it before it disappears</h2>
             </div>
-            <button onClick={copyChecklist} className="button-ghost min-h-9 shrink-0 px-3 text-xs">
-              <Copy className="h-3.5 w-3.5" /> {copied ? 'Copied' : 'Copy note'}
+            <button onClick={copyChecklist} className="button-ghost min-h-11 shrink-0 px-3 text-xs">
+              <Copy className="h-3.5 w-3.5" /> {copyStatus === 'copied' ? 'Copied' : copyStatus === 'failed' ? 'Copy unavailable' : 'Copy note'}
             </button>
           </div>
+          <span role="status" aria-live="polite" className="sr-only">{copyStatus === 'copied' ? 'Evidence note copied.' : copyStatus === 'failed' ? 'Could not copy the evidence note.' : ''}</span>
           <div className="mt-5 grid gap-3 sm:grid-cols-2">
             {['Screenshots of the message, profile, and website', 'Transaction reference, account number, amount, date and time', 'Phone numbers, usernames, URLs, and email headers', 'A short timeline: what happened and what you shared'].map(item => (
               <div key={item} className="flex gap-3 rounded-lg border border-[var(--line-dim)] bg-black/20 p-3 text-sm leading-5 text-[var(--green-soft)]">
